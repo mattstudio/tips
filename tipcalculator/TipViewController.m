@@ -18,6 +18,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *splitLabel;
 @property (weak, nonatomic) IBOutlet UILabel *splitTotalLabel;
 @property (weak, nonatomic) IBOutlet UILabel *splitTitleLabel;
+@property (weak, nonatomic) IBOutlet UILabel *tipPercentageLabel;
 
 - (IBAction)onTap:(id)sender;
 - (void)updateValues;
@@ -30,7 +31,7 @@
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        self.title = @"Spinal Tip Calculator";
+        self.title = @"Tip Calculator";
     }
     return self;
 }
@@ -55,23 +56,24 @@
 
 - (void)updateValues
 {
-    float billAmount = [self.billTextField.text floatValue];
-    
     NSArray *tipValues = @[@(0.10), @(0.15), @(0.20)];
     
-    float tipAmount = billAmount *[tipValues[self.tipControl.selectedSegmentIndex] floatValue];
-    
+    float billAmount = [self.billTextField.text floatValue];
+    float tipPercentage = [tipValues[self.tipControl.selectedSegmentIndex] floatValue];
+    float tipAmount = billAmount * tipPercentage;
     float totalAmount = tipAmount + billAmount;
-    
-    self.tipLabel.text = [NSString stringWithFormat:@"%0.2f", tipAmount];
-    self.totalLabel.text = [NSString stringWithFormat:@"%0.2f", totalAmount];
-
-    self.splitLabel.text = [NSString stringWithFormat:@"%i", (int)self.splitStepper.value];
-    
     float splitAmount = totalAmount / self.splitStepper.value;
     
-    self.splitTotalLabel.text = [NSString stringWithFormat:@"%0.2f", splitAmount];
+    self.tipPercentageLabel.text = [NSString stringWithFormat:@"(%0.0f%%)", (tipPercentage * 100)];
+    self.billTextField.text = [NSString stringWithFormat:@"%0.2f", billAmount];
+    self.tipLabel.text = [NSString stringWithFormat:@"$%0.2f", tipAmount];
+    self.totalLabel.text = [NSString stringWithFormat:@"$%0.2f", totalAmount];
+    self.splitLabel.text = [NSString stringWithFormat:@"%i", (int)self.splitStepper.value];
+    self.splitTotalLabel.text = [NSString stringWithFormat:@"$%0.2f", splitAmount];
     
+    if (billAmount < 0.01) {
+        self.billTextField.text = @"";
+    }
     
     if (self.splitStepper.value == 1) {
         self.splitTotalLabel.alpha = 0;
